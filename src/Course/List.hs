@@ -206,7 +206,7 @@ flatMap = (flatten .) . map
 flattenAgain ::
   List (List a)
   -> List a
-flattenAgain list = flatMap (\a -> a) list
+flattenAgain list = flatMap id list
 
 -- | Convert a list of optional values to an optional list of values.
 --
