@@ -236,7 +236,7 @@ seqOptional ::
 seqOptional = 
   foldRight 
   (\val acc -> twiceOptional (\a b -> a :. b) val acc) 
-  (Full Nil) 
+  (Full Nil)
 
 -- | Find the first element in the list matching the predicate.
 --
