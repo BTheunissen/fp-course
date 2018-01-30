@@ -65,12 +65,12 @@ instance Monad Optional where
 --
 -- >>> ((*) =<< (+10)) 7
 -- 119
-instance Monad ((->) t) where
+instance Monad ((->) config) where
   (=<<) ::
-    (a -> ((->) t b))
-    -> ((->) t a)
-    -> ((->) t b)
-  (=<<) atb ta = \t -> atb (ta t) t
+    (a -> config -> b)
+    -> (config -> a)
+    -> (config -> b)
+  (=<<) aconfigb configa = \config -> aconfigb (configa config) config
 
 -- | Witness that all things with (=<<) and (<$>) also have (<*>).
 --
