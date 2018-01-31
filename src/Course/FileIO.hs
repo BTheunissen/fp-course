@@ -77,10 +77,8 @@ the contents of c
 -}
 
 -- /Tip:/ use @getArgs@ and @run@
-main ::
-  IO ()
-main =
-  error "todo: Course.FileIO#main"
+main :: IO ()
+main = undefined
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@ and @printFiles@.
@@ -111,8 +109,8 @@ getFile =
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
-printFiles =
-  error "todo: Course.FileIO#printFiles"
+printFiles fileList = 
+  void (sequence ((\file -> printFile (fst file) (snd file)) <$> fileList))
 
 -- Given the file name, and file contents, print them.
 -- Use @putStrLn@.
@@ -120,5 +118,6 @@ printFile ::
   FilePath
   -> Chars
   -> IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
+printFile fileName fileContents = 
+  putStrLn fileName >>= (\_ -> putStrLn fileContents)
+  
