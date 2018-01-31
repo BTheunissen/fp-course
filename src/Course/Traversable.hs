@@ -76,7 +76,7 @@ instance (Traversable f, Traversable g) =>
   Traversable (Compose f g) where
 -- Implement the traverse function for a Traversable instance for Compose
   traverse =
-    error "todo: Course.Traversable traverse#instance (Compose f g)"
+    undefined
 
 -- | The `Product` data type contains one value from each of the two type constructors.
 data Product f g a =
