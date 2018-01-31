@@ -142,7 +142,7 @@ join = (=<<) id
   f a
   -> (a -> f b)
   -> f b
-(>>=) fa afb = join (afb <$> fa)
+(>>=) = flip (=<<)
 
 infixl 1 >>=
 

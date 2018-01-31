@@ -222,10 +222,11 @@ bindParser ap parser = ap =<< parser
   -> Parser a
   -> Parser a
 (|||) pa pb = P (\i ->
+  let x = parse pa i in
   bool
-    (parse pa i)
+    x
     (parse pb i)
-    (isErrorResult (parse pa i)))
+    (isErrorResult x))
 
 infixl 3 |||
 
@@ -436,7 +437,10 @@ ageParser = natural
 -- True
 firstNameParser ::
   Parser Chars
-firstNameParser = valueParser 'a' >>= upper
+firstNameParser =
+  upper >>= \u -> 
+  list lower >>= \l ->
+  pure (u:.l)
 
 -- | Write a parser for Person.surname.
 --
@@ -458,7 +462,11 @@ firstNameParser = valueParser 'a' >>= upper
 surnameParser ::
   Parser Chars
 surnameParser =
-  error "todo: Course.Parser#surnameParser"
+  do  a <- upper
+      b <- thisMany 5 lower
+      c <- list lower
+      pure (a :. b ++ c)
+
 
 -- | Write a parser for Person.smoker.
 --
@@ -476,8 +484,7 @@ surnameParser =
 -- True
 smokerParser ::
   Parser Char
-smokerParser =
-  error "todo: Course.Parser#smokerParser"
+smokerParser = is 'y' ||| is 'n'
 
 -- | Write part of a parser for Person#phoneBody.
 -- This parser will only produce a string of digits, dots or hyphens.
@@ -498,8 +505,7 @@ smokerParser =
 -- Result >a123-456< ""
 phoneBodyParser ::
   Parser Chars
-phoneBodyParser =
-  error "todo: Course.Parser#phoneBodyParser"
+phoneBodyParser = list (digit ||| is '.' ||| is '-')
 
 -- | Write a parser for Person.phone.
 --
@@ -520,8 +526,12 @@ phoneBodyParser =
 -- True
 phoneParser ::
   Parser Chars
-phoneParser =
-  error "todo: Course.Parser#phoneParser"
+phoneParser = 
+  do  a <- digit
+      b <- phoneBodyParser
+      is '#'
+      pure (a :. b)
+  
 
 -- | Write a parser for Person.
 --
@@ -570,7 +580,16 @@ phoneParser =
 personParser ::
   Parser Person
 personParser =
-  error "todo: Course.Parser#personParser"
+  do  a <- ageParser
+      spaces1
+      b <- firstNameParser
+      spaces1
+      c <- surnameParser
+      spaces1
+      d <- smokerParser
+      spaces1
+      e <- phoneParser
+      pure (Person a b c d e)
 
 -- Make sure all the tests pass!
 
@@ -597,13 +616,17 @@ instance Applicative Parser where
     -> Parser a
     -> Parser b
   (<*>) abp parser =
+    {-}
     P (\i -> case parse abp i of
       UnexpectedEof -> UnexpectedEof
-      ExpectedEof _ -> ExpectedEof i
+      ExpectedEof x -> ExpectedEof x
       UnexpectedChar c -> UnexpectedChar c
       UnexpectedString cs -> UnexpectedString cs
       Result inp f -> parse (f <$> parser) inp)
-
+-}
+    abp >>= \f ->
+    parser >>= \g ->
+    pure (f g)
 -- | Write a Monad instance for a @Parser@.
 instance Monad Parser where
   (=<<) ::
@@ -613,7 +636,7 @@ instance Monad Parser where
   (=<<) ap parser = 
     P (\i -> case parse parser i of
       UnexpectedEof -> UnexpectedEof
-      ExpectedEof _ -> ExpectedEof i
+      ExpectedEof x -> ExpectedEof x
       UnexpectedChar c -> UnexpectedChar c
       UnexpectedString cs -> UnexpectedString cs
       Result inp a -> parse (ap a) inp)
