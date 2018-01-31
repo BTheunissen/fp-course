@@ -78,31 +78,32 @@ the contents of c
 
 -- /Tip:/ use @getArgs@ and @run@
 main :: IO ()
-main = undefined
+main = getArgs >>= (\(h :. _) -> run h)
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@ and @printFiles@.
 run ::
   FilePath
   -> IO ()
-run =
-  error "todo: Course.FileIO#run"
+run fileName = 
+  do
+    fileNames <- lines <$> (readFile fileName)
+    files <- getFiles fileNames
+    printFiles files
 
 -- Given a list of file names, return list of (file name and file contents).
 -- Use @getFile@.
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
-getFiles =
-  error "todo: Course.FileIO#getFiles"
+getFiles list = sequence (getFile <$> list)
 
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile =
-  error "todo: Course.FileIO#getFile"
+getFile filePath = (\chars -> (filePath, chars)) <$> (readFile filePath)
 
 -- Given a list of (file name and file contents), print each.
 -- Use @printFile@.
@@ -119,5 +120,7 @@ printFile ::
   -> Chars
   -> IO ()
 printFile fileName fileContents = 
-  putStrLn fileName >>= (\_ -> putStrLn fileContents)
-  
+  do 
+    putStrLn fileName
+    y <- putStrLn fileContents
+    pure y
